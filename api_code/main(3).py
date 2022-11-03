@@ -3,12 +3,22 @@ from transformers import pipeline
 from typing import TypeVar
 from youtube_transcript_api import YouTubeTranscriptApi
 
+# Model type providing a basic interface for calling the model, without worrying about the details
+# of the model's architecture
+class SimpleModel:
+    # model can be any model that generates text
+    # func must take a model and a string and return a string
+    def __init__(self, model, func):
+        self.model = model
+        self.func = func
+
+    def __call__(self, string):
+        return self.func(self.model, string)
+
+
 # Result-like class inspired by Rust
-T = TypeVar("T")
-
-
 class Result:
-    def __init__(self, ok: bool, value: T = None, error: str = ""):
+    def __init__(self, ok: bool, value = None, error: str = ""):
         self.ok = ok
         # If the result is ok, set the value. Otherwise, set the error
         self.value = value if ok else None
@@ -47,7 +57,7 @@ class Result:
             return self
 
 
-is_youtube_regex = re.compile(r"https?://(www\.)?youtube\.com")
+is_youtube_regex = re.compile(r"(?:https?://)?(www\.)?youtu(?:be\.com|\.be).*")
 
 
 def is_youtube(link: str) -> bool:
@@ -55,7 +65,11 @@ def is_youtube(link: str) -> bool:
     return is_youtube_regex.match(link) is not None
 
 
-youtube_video_id_regex = re.compile(r"https?://(?:(?:(?:www\.youtube\.com|m\.youtube\.com)/watch\?v=([0-9A-Za-z_-]{10}[048AEIMQUYcgkosw]).*)|(?:youtu\.be/([0-9A-Za-z_-]{10}[048AEIMQUYcgkosw])))")
+youtube_video_id_regex = re.compile(
+    r"(?:https?://)?"
+    r"(?:(?:www\.)?youtube\.com/watch\?v=|m\.youtube\.com/watch\?v=|youtu\.be/)"
+    r"([0-9A-Za-z_-]{10}[048AEIMQUYcgkosw]).*"
+)
 
 
 def get_youtube_video_id(link: str) -> Result:
@@ -77,23 +91,20 @@ def get_transcript(video_id: str) -> Result:
         return Result(False, error=str(e))
 
 
-def get_summary(text: str, gen) -> Result:
-    # Gen must be a transformers pipeline
+def get_summary(text: str, model: SimpleModel, prompter) -> Result:
+    # Prompter must be a function that takes a string and returns a string
+    # You can use simple_prompter to get a simple prompter
     try:
-        prompt = text + "\n TLDR: "
-        # WARNING: This is designed around gpt-neo-125M, which can be called in the following way
-        # Other models may require different parameters, and different ways of obtaining the summary
-        # Read through the documentation of the models for proper usage
-        summary = gen(prompt, do_sample=True, temperature=0.9, max_new_tokens=200)[0]["generated_text"]
-        return Result(True, value=summary[len(prompt):].strip())
+        prompt = prompter(text)
+        return Result(True, model(prompt))
     except Exception as e:
         return Result(False, error=str(e))
 
 
-def link_to_summary(link: str, gen) -> Result:
+def link_to_summary(link: str, gen, prompter) -> Result:
     return get_youtube_video_id(link) \
         .flat_map(get_transcript) \
-        .flat_map(lambda text: get_summary(text, gen))
+        .flat_map(lambda text: get_summary(text, gen, prompter))
 
 
 def link_to_transcript(link: str) -> Result:
@@ -101,10 +112,10 @@ def link_to_transcript(link: str) -> Result:
         .flat_map(get_transcript)
 
 
-def link_to_prompt(link: str) -> Result:
+def link_to_prompt(link: str, prompter) -> Result:
     return get_youtube_video_id(link) \
         .flat_map(get_transcript) \
-        .flat_map(lambda text: Result(True, value=text + "\n TLDR: "))
+        .flat_map(lambda text: Result(True, value=prompter(text)))
 
 
 def unwrap_result(result: Result):
@@ -114,10 +125,21 @@ def unwrap_result(result: Result):
         raise Exception(result.error)
 
 
+# Convenience functions for prompts
+# This returns a simple lambda that takes a string and returns a string
+def simple_prompter(text: str):
+    return lambda x: x + text
+
+
 def main():
-    pipe = pipeline('text-generation', model='EleutherAI/gpt-neo-125M')
+    model = SimpleModel(
+        pipeline('text-generation', model='EleutherAI/gpt-neo-125M'),
+        lambda mdl, prompt:
+        mdl(prompt, do_sample=True, temperature=0.9, max_new_tokens=200)[0]["generated_text"][len(prompt):].strip()
+    )
     link = input("Enter a youtube link: ")
-    result = link_to_summary(link, pipe)
+    prompter = lambda x: x + "\n TLDR: "
+    result = link_to_summary(link, model, prompter)
     print(result)
 
 
