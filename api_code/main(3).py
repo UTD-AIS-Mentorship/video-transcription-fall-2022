@@ -3,6 +3,7 @@ from transformers import pipeline
 from typing import TypeVar
 from youtube_transcript_api import YouTubeTranscriptApi
 
+
 # Model type providing a basic interface for calling the model, without worrying about the details
 # of the model's architecture
 class SimpleModel:
@@ -18,7 +19,7 @@ class SimpleModel:
 
 # Result-like class inspired by Rust
 class Result:
-    def __init__(self, ok: bool, value = None, error: str = ""):
+    def __init__(self, ok: bool, value=None, error: str = ""):
         self.ok = ok
         # If the result is ok, set the value. Otherwise, set the error
         self.value = value if ok else None
@@ -101,7 +102,21 @@ def get_summary(text: str, model: SimpleModel, prompter) -> Result:
         return Result(False, error=str(e))
 
 
-def link_to_summary(link: str, gen, prompter) -> Result:
+def link_to_summary_prompter(link: str, gen, prompter) -> Result:
+    return get_youtube_video_id(link) \
+        .flat_map(get_transcript) \
+        .flat_map(lambda text: get_summary(text, gen, prompter))
+
+
+def link_to_summary_string(link: str, gen, string) -> Result:
+    prompter = lambda x: x + string
+    return get_youtube_video_id(link) \
+        .flat_map(get_transcript) \
+        .flat_map(lambda text: get_summary(text, gen, prompter))
+
+
+def link_to_summary_simple(link: str, gen) -> Result:
+    prompter = lambda x: x + "\n TLDR: "
     return get_youtube_video_id(link) \
         .flat_map(get_transcript) \
         .flat_map(lambda text: get_summary(text, gen, prompter))
