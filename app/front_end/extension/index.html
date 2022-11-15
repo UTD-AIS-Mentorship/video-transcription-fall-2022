@@ -28,10 +28,6 @@
     <img src="doodle2.png" style="pad:0px; position:relative; top: 1350px; left: 380px; width:100px;height:100px;">
     <img src="doodle2.png" style="pad:0px; position:relative; top: 250px; left: -280px; width:50px;height:50px;">
 
-    <div class="container mt-3" style="position: absolute; top: 150px; left:20%">
-        <h1><button id="button">summarize!</button></h1>
-        <h1>Your summary will appear below.</h1>      
-    </div>
     <div style="position:absolute; top: 2px; left: 90px; font-size: 20px;"><h1>YouTube</h1></div>
     <div style="position:absolute; top: 2px; left: 340px; font-size: 20px;">
         <h1>Summary</h1>
@@ -41,18 +37,21 @@
     <div style="position: absolute; top: 100px; left: 25px; width: 550px;">
         <h2 id="result"></h2>
     </div>
-    <div class="rating">
-        <input type="radio" name="star" id="star1"><label for="star1"></label>
-        <input type="radio" name="star" id="star2"><label for="star2"></label>
-        <input type="radio" name="star" id="star3"><label for="star3"></label>
-        <input type="radio" name="star" id="star4"><label for="star4"></label>
-        <input type="radio" name="star" id="star5"><label for="star5"></label>
+    <div class="rating" style="position: absolute; top:1800px; left:50%;">
+        <input type="radio" name="star" id="star1" value=5><label for="star1"></label>
+        <input type="radio" name="star" id="star2" value=4><label for="star2"></label>
+        <input type="radio" name="star" id="star3" value=3><label for="star3"></label>
+        <input type="radio" name="star" id="star4" value=2><label for="star4"></label>
+        <input type="radio" name="star" id="star5" value=1><label for="star5"></label>
+        <button style="position: absolute; top:100px; left:45%; font-size: 24px; width:70px;transform: translate(-50%,-50%) rotateY(180deg);">rate!</button>
+        <h4 style="position: absolute;transform: translate(-50%,-50%) rotateY(180deg); top:-50px; left: 110px; width: 200px; font-size: 20px;">rate that summary!</h4>
     </div>
-    <div class="container mt-3" style="position: absolute; top: 1830px; left:45%;">
-        <h1><button id="button" style="font-size: 24px; width:70px;">rate!</button></h1>
+    <div class="container mt-3" style="position: absolute; top: 150px; left:20%">
+        <h1><button id="button">summarize!</button></h1>
+        <h1>Your summary will appear below.</h1>
     </div>
+    <script src="script.js"></script>
 </body>
-<script src="script.js"></script>
 
 
 </html>
