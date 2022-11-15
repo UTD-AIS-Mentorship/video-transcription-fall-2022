@@ -1,4 +1,11 @@
-
+// takes submitted star rating
+let btnShow = document.querySelector("button");
+let result = document.querySelector("h4");
+btnShow.addEventListener("click", () => {
+  let selected = document.querySelector('input[type="radio"]:checked');
+  result.innerText = "thanks! rating: " + selected.value;
+  // @TODO: select.value is the rating between 1 and 5. Send this to the model.
+});
 async function fetchData() {
     // const res=await fetch("https://api.coronavirus.data.gov.uk/v1/data");
     // const record=await res.json();
