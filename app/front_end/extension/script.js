@@ -1,4 +1,8 @@
 // takes submitted star rating
+// import {fullPipeline, fullPipelineNoPrompt} from './extension_backend.js'; 
+// load imports somehow using: https://medium.com/front-end-weekly/es6-modules-in-chrome-extensions-an-introduction-313b3fce955b
+
+
 let btnShow = document.querySelector("button");
 let result = document.querySelector("h4");
 btnShow.addEventListener("click", () => {
@@ -7,36 +11,34 @@ btnShow.addEventListener("click", () => {
   // @TODO: select.value is the rating between 1 and 5. Send this to the model.
 });
 async function fetchData() {
-    // const res=await fetch("https://api.coronavirus.data.gov.uk/v1/data");
-    // const record=await res.json();
-    // document.getElementById("date").innerHTML=record.data[0].date;
-    // document.getElementById("areaName").innerHTML=record.data[0].areaName;
-    // document.getElementById("latestBy").innerHTML=record.data[0].latestBy;
-    // document.getElementById("deathNew").innerHTML=record.data[0].deathNew;
     let url = ""
     
     chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
         url = tabs[0].url;
+        console.log(url)
         // use `url` here inside the callback because it's asynchronous!
-        document.getElementById("result").innerHTML=url;
+        
+        document.getElementById("result").innerHTML=url; // pass this variable into a new "getTranscript(url)" function
+                                                          // pass transcript to jacckson func then return summary
+                                                          // pass summary to HTML 
     });
 
     document.getElementById('button').addEventListener('click',function(){
         document.getElementById("working").innerHTML="LOADING";
 
-        let data = {  
-            "id": 20,
-            "link": url,
-            "summary": "",
-            "rating": 5
-        };
+        let data = url;
+        // pass url to a to transcript func
+        // pass transcript func to jacksonfunc
+        // jacksonfunc returns summary
 
-
-        const res = fetch("http://53a2-34-170-233-180.ngrok.io/items", {
+        // Remove the post request below. It's elsewhere. Instead, just call either fullPipeline or fullPipelineNoPrompt
+        
+        
+        const res = fetch("https://yyy35rmdka.execute-api.us-east-2.amazonaws.com/prod/", {
           method: "POST",
           headers: new Headers({
             'Content-Type': 'application/json',
-            "ngrok-skip-browser-warning": "69420"
+            // "ngrok-skip-browser-warning": "69420"
           }),
           body: JSON.stringify(data),
           mode: "cors"
@@ -44,11 +46,18 @@ async function fetchData() {
         .then(response => response.json())
         .then((data) => {
           console.log("Request complete! response:", data);
-          document.getElementById("working").innerHTML=JSON.stringify(data);
+          document.getElementById("working").innerHTML=JSON.stringify(data.body);
         });
         
-        //   document.getElementById("working").innerHTML=result    
-    })
+
+        /*
+        result = fullPipeline(data, true);
+        document.getElementById("working").innerHTML=result;
+        */
+    });
+
+    
+
 
 }
 
