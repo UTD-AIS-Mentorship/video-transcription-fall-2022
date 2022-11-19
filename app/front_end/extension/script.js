@@ -46,7 +46,13 @@ async function fetchData() {
         .then(response => response.json())
         .then((data) => {
           console.log("Request complete! response:", data);
-          document.getElementById("working").innerHTML=JSON.stringify(data.body);
+          if (data.body !== undefined){
+            document.getElementById("working").innerHTML=JSON.stringify(data.body);
+          }
+          else{
+            document.getElementById("working").innerHTML=JSON.stringify("Something went wrong: Summary unavailable due to language model going down.");
+          }
+          
         });
         
 
