@@ -1,6 +1,6 @@
 h1 {
     color: black;
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: Helvetica, Arial, sans-serif;
     text-align: center;
     padding-bottom: 20px;
 }
@@ -11,18 +11,17 @@ h2{
     border-style: solid;
     color: grey;
     text-align: center;
-    font-family: Fira Sans;
+    font-family: Helvetica, Arial, sans-serif;
     font-size: 15px;    
 }
 
 h3{
     color: black;
     text-align: center;
-    font-family: 'Times New Roman';
+    font-family: Helvetica, Arial, sans-serif;
     border-color: red;
     border-width: 3px;
     border-style: solid;
-    font-family: Fira Sans;
 }
 
 button {
@@ -70,7 +69,7 @@ button:hover {
 .rating label:before
 {
     content: '\f005';
-    font-family: fontAwesome;
+    font-family: fontAwesome, Helvetica, Arial, sans-serif;
     position: relative;
     display: block;
     font-size: 50px;
@@ -79,7 +78,7 @@ button:hover {
 
 .rating label:after {
     content: '\f005';
-    font-family: fontAwesome;
+    font-family: fontAwesome, Helvetica, Arial, sans-serif;
     position: absolute;
     display: block;
     font-size: 50px;
